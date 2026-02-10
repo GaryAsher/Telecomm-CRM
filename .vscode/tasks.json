@@ -2,6 +2,15 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Tele-CRM: Sync from GitHub + Run Prototype",
+      "type": "shell",
+      "command": "bash scripts/sync-and-run-prototype.sh",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "Tele-CRM: Start Prototype (Easy)",
       "type": "shell",
       "command": "bash scripts/start-prototype-easy.sh",
