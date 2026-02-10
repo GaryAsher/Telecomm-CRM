@@ -28,6 +28,35 @@ body {
   font-size: 0.85rem;
 }
 
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.8rem 1rem 0;
+}
+
+.tab {
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #0f172a;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
 .layout {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -43,6 +72,11 @@ body {
   min-height: 220px;
 }
 
+.companies-panel,
+.admin-panel {
+  margin: 1rem;
+}
+
 .list {
   list-style: none;
   margin: 0;
@@ -55,14 +89,17 @@ body {
   border: 1px solid #cbd5e1;
   border-radius: 10px;
   padding: 0.7rem;
+}
+
+#queue-list li {
   cursor: pointer;
 }
 
-.list li:hover {
+#queue-list li:hover {
   border-color: #2563eb;
 }
 
-.list li.active {
+#queue-list li.active {
   border-color: #2563eb;
   background: #eff6ff;
 }
@@ -74,6 +111,18 @@ body {
 
 .muted {
   color: #64748b;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.7rem;
+  border-bottom: 1px solid #dbeafe;
 }
 
 label {
