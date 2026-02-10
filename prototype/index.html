@@ -3,51 +3,92 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Telecomm CRM Prototype</title>
+    <title>Tele-CRM Prototype</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <header class="topbar">
-      <h1>Telecomm CRM Prototype</h1>
+      <h1>Tele-CRM Prototype</h1>
       <div class="badge">Prototype</div>
     </header>
 
-    <main class="layout">
-      <section class="panel">
-        <h2>Active Queue</h2>
-        <ul id="queue-list" class="list"></ul>
+    <nav class="tabs" aria-label="Main navigation tabs">
+      <button class="tab active" data-tab="dashboard">Dashboard</button>
+      <button class="tab" data-tab="companies">Companies</button>
+      <button class="tab" data-tab="admin">Admin</button>
+    </nav>
+
+    <main>
+      <section id="dashboard" class="tab-panel active">
+        <div class="layout">
+          <section class="panel">
+            <h2>Updates</h2>
+            <ul id="updates-list" class="list"></ul>
+          </section>
+
+          <section class="panel">
+            <h2>Mail</h2>
+            <ul id="mail-list" class="list"></ul>
+          </section>
+
+          <section class="panel">
+            <h2>Active Queue</h2>
+            <ul id="queue-list" class="list"></ul>
+          </section>
+
+          <section class="panel">
+            <h2>Caller Profile</h2>
+            <div id="caller-profile" class="profile muted">Select a queue item to view details.</div>
+          </section>
+        </div>
       </section>
 
-      <section class="panel">
-        <h2>Caller Profile</h2>
-        <div id="caller-profile" class="profile muted">Select a queue item to view details.</div>
+      <section id="companies" class="tab-panel">
+        <section class="panel companies-panel">
+          <h2>Company Database (Fake Data for Now)</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Company</th>
+                <th>Location</th>
+                <th>Hours</th>
+                <th>Employees</th>
+              </tr>
+            </thead>
+            <tbody id="companies-table-body"></tbody>
+          </table>
+        </section>
       </section>
 
-      <section class="panel">
-        <h2>Log Interaction</h2>
-        <form id="interaction-form">
-          <label>
-            Outcome
-            <select id="outcome" required>
-              <option value="">Select outcome...</option>
-              <option value="Resolved">Resolved</option>
-              <option value="Escalated">Escalated</option>
-              <option value="Callback Scheduled">Callback Scheduled</option>
-            </select>
-          </label>
+      <section id="admin" class="tab-panel">
+        <section class="panel admin-panel">
+          <h2>Admin: Add New Company</h2>
+          <form id="company-form">
+            <label>
+              Company Name
+              <input id="company-name" required placeholder="Example Care Clinic" />
+            </label>
 
-          <label>
-            Notes
-            <textarea id="notes" rows="4" placeholder="Add call notes"></textarea>
-          </label>
+            <label>
+              Location
+              <input id="company-location" required placeholder="City, ST" />
+            </label>
 
-          <button type="submit">Save Interaction</button>
-        </form>
-      </section>
+            <label>
+              Hours
+              <input id="company-hours" required placeholder="Mon-Fri 8:00 AM - 5:00 PM" />
+            </label>
 
-      <section class="panel">
-        <h2>Recent Activity</h2>
-        <ul id="activity-log" class="list"></ul>
+            <label>
+              Number of Employees
+              <input id="company-employee-count" type="number" min="1" value="1" required />
+            </label>
+
+            <button type="submit">Add Company</button>
+          </form>
+
+          <p class="muted">Added companies appear in the Companies tab for this prototype session.</p>
+        </section>
       </section>
     </main>
 
