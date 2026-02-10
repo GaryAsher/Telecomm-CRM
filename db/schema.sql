@@ -1,101 +1,33 @@
--- Initial PostgreSQL schema for Telecomm CRM MVP
+# Stack Recommendation for Telecomm CRM
 
-CREATE TABLE IF NOT EXISTS users (
-  id BIGSERIAL PRIMARY KEY,
-  email TEXT UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
-  display_name TEXT NOT NULL,
-  is_active BOOLEAN NOT NULL DEFAULT TRUE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+## Short answer
+Yes, your current ecosystem is usable for this project. You do **not** need to switch to React just because this is enterprise-facing.
 
-CREATE TABLE IF NOT EXISTS roles (
-  id BIGSERIAL PRIMARY KEY,
-  name TEXT UNIQUE NOT NULL,
-  description TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+## Recommended stack (based on what you already use)
+- **Frontend:** SvelteKit + TypeScript
+- **Hosting/Edge:** Cloudflare Pages (frontend) + Cloudflare Workers (webhook/API endpoints as needed)
+- **Database/Auth:** Supabase Postgres + Supabase Auth
+- **Security/Networking:** Cloudflare WAF, bot protection, rate limiting, and zero-trust controls for admin panels
+- **Realtime (optional):** Supabase Realtime for live call queue/agent state updates
 
-CREATE TABLE IF NOT EXISTS permissions (
-  id BIGSERIAL PRIMARY KEY,
-  key TEXT UNIQUE NOT NULL,
-  description TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+## Why this is a strong fit
+1. **Speed of delivery:** You already know this stack, so your iteration speed will be higher.
+2. **Operational simplicity:** Supabase + Cloudflare remove a lot of infra burden early.
+3. **Enterprise requirements are still possible:** RBAC, auditing, API security, and observability are architectural concerns, not React-only concerns.
 
-CREATE TABLE IF NOT EXISTS user_roles (
-  user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  role_id BIGINT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
-  assigned_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  PRIMARY KEY (user_id, role_id)
-);
+## React vs Svelte for this project
+- Choose **React** if you need a team with very broad hiring pool and many off-the-shelf enterprise UI libraries.
+- Choose **Svelte/SvelteKit** if you want faster development and already have working experience.
+- For your stated context, **SvelteKit is the better move now**. You can still keep a clean API boundary and migrate UI framework later if needed.
 
-CREATE TABLE IF NOT EXISTS role_permissions (
-  role_id BIGINT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
-  permission_id BIGINT NOT NULL REFERENCES permissions(id) ON DELETE CASCADE,
-  granted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  PRIMARY KEY (role_id, permission_id)
-);
+## Minimum architecture pattern
+- Keep API contracts framework-agnostic (OpenAPI spec).
+- Put RBAC enforcement in backend/edge API, not frontend.
+- Maintain append-only audit logs for sensitive entity writes.
+- Normalize phone numbers and design idempotent telephony webhook handlers.
 
-CREATE TABLE IF NOT EXISTS callers (
-  id BIGSERIAL PRIMARY KEY,
-  phone_number TEXT NOT NULL,
-  normalized_phone TEXT NOT NULL UNIQUE,
-  full_name TEXT,
-  account_reference TEXT,
-  status TEXT NOT NULL DEFAULT 'new',
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS interactions (
-  id BIGSERIAL PRIMARY KEY,
-  caller_id BIGINT NOT NULL REFERENCES callers(id) ON DELETE CASCADE,
-  assigned_user_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
-  interaction_type TEXT NOT NULL DEFAULT 'call',
-  direction TEXT NOT NULL CHECK (direction IN ('inbound', 'outbound')),
-  started_at TIMESTAMPTZ,
-  ended_at TIMESTAMPTZ,
-  outcome TEXT,
-  notes TEXT,
-  created_by BIGINT REFERENCES users(id) ON DELETE SET NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS audit_logs (
-  id BIGSERIAL PRIMARY KEY,
-  actor_user_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
-  entity_type TEXT NOT NULL,
-  entity_id BIGINT NOT NULL,
-  action TEXT NOT NULL,
-  old_values JSONB,
-  new_values JSONB,
-  occurred_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS idx_callers_normalized_phone ON callers(normalized_phone);
-CREATE INDEX IF NOT EXISTS idx_interactions_caller_id ON interactions(caller_id);
-CREATE INDEX IF NOT EXISTS idx_interactions_assigned_user_id ON interactions(assigned_user_id);
-CREATE INDEX IF NOT EXISTS idx_audit_logs_entity ON audit_logs(entity_type, entity_id);
-CREATE INDEX IF NOT EXISTS idx_audit_logs_actor ON audit_logs(actor_user_id);
-
-INSERT INTO roles (name, description)
-VALUES
-  ('admin', 'Full access to users, roles, and CRM records'),
-  ('supervisor', 'Can monitor and manage team interaction workflows'),
-  ('agent', 'Can view/update assigned caller interactions'),
-  ('viewer', 'Read-only access to caller records')
-ON CONFLICT (name) DO NOTHING;
-
-INSERT INTO permissions (key, description)
-VALUES
-  ('users.manage', 'Create/update/deactivate users'),
-  ('roles.manage', 'Assign roles and permissions'),
-  ('callers.read', 'View caller records'),
-  ('callers.write', 'Create and update caller records'),
-  ('interactions.read', 'View interaction records'),
-  ('interactions.write', 'Create and update interactions'),
-  ('audit.read', 'View audit logs')
-ON CONFLICT (key) DO NOTHING;
+## Practical starter milestones
+1. Build auth + roles + permission checks first.
+2. Implement caller and interaction CRUD with audit events.
+3. Add inbound telephony webhook ingestion with idempotency keys.
+4. Build a simple agent dashboard with role-scoped actions.
