@@ -38,27 +38,12 @@ const mail = [
 ];
 
 const companies = [
-  {
-    name: 'Northside Family Practice',
-    location: 'Springfield, IL',
-    hours: 'Mon-Fri 8:00 AM - 5:00 PM',
-    employees: 26,
-  },
-  {
-    name: 'Riverbend Internal Medicine',
-    location: 'Columbus, OH',
-    hours: 'Mon-Sat 9:00 AM - 6:00 PM',
-    employees: 41,
-  },
-  {
-    name: 'Pinecrest Health Group',
-    location: 'Nashville, TN',
-    hours: 'Mon-Fri 7:30 AM - 7:00 PM',
-    employees: 32,
-  },
+  { name: 'Northside Family Practice', location: 'Springfield, IL', hours: 'Mon-Fri 8:00 AM - 5:00 PM', employees: 26 },
+  { name: 'Riverbend Internal Medicine', location: 'Columbus, OH', hours: 'Mon-Sat 9:00 AM - 6:00 PM', employees: 41 },
+  { name: 'Pinecrest Health Group', location: 'Nashville, TN', hours: 'Mon-Fri 7:30 AM - 7:00 PM', employees: 32 },
 ];
 
-const tabButtons = document.querySelectorAll('.tab');
+const tabLinks = document.querySelectorAll('[data-tab-link]');
 const tabPanels = document.querySelectorAll('.tab-panel');
 
 const queueList = document.getElementById('queue-list');
@@ -75,23 +60,35 @@ const companyEmployeeCountInput = document.getElementById('company-employee-coun
 
 let selectedCaller = null;
 
-function switchTab(tabId) {
-  for (const btn of tabButtons) {
-    btn.classList.toggle('active', btn.dataset.tab === tabId);
+function switchSection(sectionId) {
+  for (const link of tabLinks) {
+    const targetId = link.getAttribute('href').slice(1);
+    link.classList.toggle('active', targetId === sectionId);
   }
 
   for (const panel of tabPanels) {
-    panel.classList.toggle('active', panel.id === tabId);
+    panel.classList.toggle('active', panel.id === sectionId);
   }
 }
 
-for (const button of tabButtons) {
-  button.addEventListener('click', () => switchTab(button.dataset.tab));
+for (const link of tabLinks) {
+  link.addEventListener('click', (event) => {
+    event.preventDefault();
+    const sectionId = link.getAttribute('href').slice(1);
+    history.replaceState(null, '', `#${sectionId}`);
+    switchSection(sectionId);
+  });
+}
+
+function openFromHash() {
+  const defaultSection = 'dashboard-section';
+  const hashSection = window.location.hash ? window.location.hash.slice(1) : defaultSection;
+  const validSection = document.getElementById(hashSection) ? hashSection : defaultSection;
+  switchSection(validSection);
 }
 
 function renderSimpleList(values, target) {
   target.innerHTML = '';
-
   for (const value of values) {
     const item = document.createElement('li');
     item.textContent = value;
@@ -101,22 +98,15 @@ function renderSimpleList(values, target) {
 
 function renderQueue() {
   queueList.innerHTML = '';
-
   for (const caller of queue) {
     const item = document.createElement('li');
-    item.dataset.id = caller.id;
     item.innerHTML = `<strong>${caller.name}</strong><br /><small>${caller.reason}</small>`;
-
-    if (selectedCaller && selectedCaller.id === caller.id) {
-      item.classList.add('active');
-    }
-
+    if (selectedCaller && selectedCaller.id === caller.id) item.classList.add('active');
     item.addEventListener('click', () => {
       selectedCaller = caller;
       renderQueue();
       renderProfile();
     });
-
     queueList.appendChild(item);
   }
 }
@@ -140,16 +130,9 @@ function renderProfile() {
 
 function renderCompanies() {
   companiesTableBody.innerHTML = '';
-
   for (const company of companies) {
     const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${company.name}</td>
-      <td>${company.location}</td>
-      <td>${company.hours}</td>
-      <td>${company.employees}</td>
-    `;
-
+    row.innerHTML = `<td>${company.name}</td><td>${company.location}</td><td>${company.hours}</td><td>${company.employees}</td>`;
     companiesTableBody.appendChild(row);
   }
 }
@@ -157,19 +140,18 @@ function renderCompanies() {
 companyForm.addEventListener('submit', (event) => {
   event.preventDefault();
 
-  const newCompany = {
+  companies.push({
     name: companyNameInput.value.trim(),
     location: companyLocationInput.value.trim(),
     hours: companyHoursInput.value.trim(),
     employees: Number(companyEmployeeCountInput.value),
-  };
+  });
 
-  companies.push(newCompany);
   renderCompanies();
   companyForm.reset();
   companyEmployeeCountInput.value = '1';
-
-  switchTab('companies');
+  history.replaceState(null, '', '#companies-section');
+  switchSection('companies-section');
 });
 
 renderSimpleList(updates, updatesList);
@@ -177,3 +159,4 @@ renderSimpleList(mail, mailList);
 renderQueue();
 renderProfile();
 renderCompanies();
+openFromHash();
