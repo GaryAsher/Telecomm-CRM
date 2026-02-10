@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Telecomm CRM Prototype</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>Telecomm CRM Prototype</h1>
+      <div class="badge">Prototype</div>
+    </header>
+
+    <main class="layout">
+      <section class="panel">
+        <h2>Active Queue</h2>
+        <ul id="queue-list" class="list"></ul>
+      </section>
+
+      <section class="panel">
+        <h2>Caller Profile</h2>
+        <div id="caller-profile" class="profile muted">Select a queue item to view details.</div>
+      </section>
+
+      <section class="panel">
+        <h2>Log Interaction</h2>
+        <form id="interaction-form">
+          <label>
+            Outcome
+            <select id="outcome" required>
+              <option value="">Select outcome...</option>
+              <option value="Resolved">Resolved</option>
+              <option value="Escalated">Escalated</option>
+              <option value="Callback Scheduled">Callback Scheduled</option>
+            </select>
+          </label>
+
+          <label>
+            Notes
+            <textarea id="notes" rows="4" placeholder="Add call notes"></textarea>
+          </label>
+
+          <button type="submit">Save Interaction</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Recent Activity</h2>
+        <ul id="activity-log" class="list"></ul>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
