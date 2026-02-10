@@ -21,18 +21,83 @@ const queue = [
     phone: '+1 (555) 349-0088',
     accountReference: 'ACCT-33002',
     status: 'Escalated',
-    reason: 'Plan upgrade',
+    reason: 'Medication refill request',
   },
 ];
 
+const updates = [
+  'Shift handoff notes added for Team A.',
+  'Password reset workflow updated for new callers.',
+  'Medication refill callback queue reviewed this morning.',
+];
+
+const mail = [
+  'IT: MFA reminders for all agents due Friday',
+  'Supervisor: Schedule update for weekend coverage',
+  'Operations: New appointment script draft ready',
+];
+
+const companies = [
+  {
+    name: 'Northside Family Practice',
+    location: 'Springfield, IL',
+    hours: 'Mon-Fri 8:00 AM - 5:00 PM',
+    employees: 26,
+  },
+  {
+    name: 'Riverbend Internal Medicine',
+    location: 'Columbus, OH',
+    hours: 'Mon-Sat 9:00 AM - 6:00 PM',
+    employees: 41,
+  },
+  {
+    name: 'Pinecrest Health Group',
+    location: 'Nashville, TN',
+    hours: 'Mon-Fri 7:30 AM - 7:00 PM',
+    employees: 32,
+  },
+];
+
+const tabButtons = document.querySelectorAll('.tab');
+const tabPanels = document.querySelectorAll('.tab-panel');
+
 const queueList = document.getElementById('queue-list');
 const profile = document.getElementById('caller-profile');
-const activityLog = document.getElementById('activity-log');
-const interactionForm = document.getElementById('interaction-form');
-const outcomeInput = document.getElementById('outcome');
-const notesInput = document.getElementById('notes');
+const updatesList = document.getElementById('updates-list');
+const mailList = document.getElementById('mail-list');
+const companiesTableBody = document.getElementById('companies-table-body');
+
+const companyForm = document.getElementById('company-form');
+const companyNameInput = document.getElementById('company-name');
+const companyLocationInput = document.getElementById('company-location');
+const companyHoursInput = document.getElementById('company-hours');
+const companyEmployeeCountInput = document.getElementById('company-employee-count');
 
 let selectedCaller = null;
+
+function switchTab(tabId) {
+  for (const btn of tabButtons) {
+    btn.classList.toggle('active', btn.dataset.tab === tabId);
+  }
+
+  for (const panel of tabPanels) {
+    panel.classList.toggle('active', panel.id === tabId);
+  }
+}
+
+for (const button of tabButtons) {
+  button.addEventListener('click', () => switchTab(button.dataset.tab));
+}
+
+function renderSimpleList(values, target) {
+  target.innerHTML = '';
+
+  for (const value of values) {
+    const item = document.createElement('li');
+    item.textContent = value;
+    target.appendChild(item);
+  }
+}
 
 function renderQueue() {
   queueList.innerHTML = '';
@@ -73,29 +138,42 @@ function renderProfile() {
   `;
 }
 
-interactionForm.addEventListener('submit', (event) => {
+function renderCompanies() {
+  companiesTableBody.innerHTML = '';
+
+  for (const company of companies) {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${company.name}</td>
+      <td>${company.location}</td>
+      <td>${company.hours}</td>
+      <td>${company.employees}</td>
+    `;
+
+    companiesTableBody.appendChild(row);
+  }
+}
+
+companyForm.addEventListener('submit', (event) => {
   event.preventDefault();
 
-  if (!selectedCaller) {
-    alert('Select a caller before saving an interaction.');
-    return;
-  }
+  const newCompany = {
+    name: companyNameInput.value.trim(),
+    location: companyLocationInput.value.trim(),
+    hours: companyHoursInput.value.trim(),
+    employees: Number(companyEmployeeCountInput.value),
+  };
 
-  const outcome = outcomeInput.value;
-  const notes = notesInput.value.trim();
-  const timestamp = new Date().toLocaleString();
+  companies.push(newCompany);
+  renderCompanies();
+  companyForm.reset();
+  companyEmployeeCountInput.value = '1';
 
-  const entry = document.createElement('li');
-  entry.innerHTML = `
-    <strong>${timestamp}</strong><br />
-    ${selectedCaller.name} — <em>${outcome}</em><br />
-    <small>${notes || 'No notes provided.'}</small>
-  `;
-  activityLog.prepend(entry);
-
-  outcomeInput.value = '';
-  notesInput.value = '';
+  switchTab('companies');
 });
 
+renderSimpleList(updates, updatesList);
+renderSimpleList(mail, mailList);
 renderQueue();
 renderProfile();
+renderCompanies();
