@@ -41,6 +41,7 @@ body {
   color: #0f172a;
   padding: 0.5rem 1rem;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .tab.active {
