@@ -33,7 +33,9 @@ This prototype is intentionally frontend-only (mock data) so you can validate wo
 
 ### Troubleshooting (most common issues)
 - **`./scripts/run-prototype.sh: Permission denied`**
-  - Run: `chmod +x scripts/run-prototype.sh`
+  - Quick workaround (no chmod needed): `bash scripts/run-prototype.sh`
+  - Permanent fix: `chmod +x scripts/run-prototype.sh`
+  - If this keeps happening after pulls: `git update-index --chmod=+x scripts/run-prototype.sh`
 - **`No such file or directory` for the script**
   - Make sure you are in the repo root first: `cd /workspace/Telecomm-CRM`
 - **`python3: command not found`**
@@ -50,6 +52,8 @@ This prototype is intentionally frontend-only (mock data) so you can validate wo
 
 
 ### GitHub vs local files (important)
+Yes—this can absolutely be the reason.
+If your changes are on GitHub but not on your computer, your local folder will not show them until you sync.
 
 If you have **not cloned** the repo yet:
 ```bash
@@ -75,3 +79,13 @@ After syncing, run the prototype again:
 ```bash
 ./scripts/run-prototype.sh
 ```
+
+
+### Running in GitHub Codespaces / VS Code terminal
+From your repo root, run:
+```bash
+pwd
+ls -l scripts/run-prototype.sh
+bash scripts/run-prototype.sh
+```
+Then open the forwarded port URL for `4173` (or `http://localhost:4173`).
