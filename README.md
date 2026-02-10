@@ -50,8 +50,6 @@ This prototype is intentionally frontend-only (mock data) so you can validate wo
 
 
 ### GitHub vs local files (important)
-Yes—this can absolutely be the reason.
-If your changes are on GitHub but not on your computer, your local folder will not show them until you sync.
 
 If you have **not cloned** the repo yet:
 ```bash
