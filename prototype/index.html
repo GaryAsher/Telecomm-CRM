@@ -13,13 +13,13 @@
     </header>
 
     <nav class="tabs" aria-label="Main navigation tabs">
-      <button class="tab active" data-tab="dashboard">Dashboard</button>
-      <button class="tab" data-tab="companies">Companies</button>
-      <button class="tab" data-tab="admin">Admin</button>
+      <a class="tab active" data-tab-link href="#dashboard-section">Dashboard</a>
+      <a class="tab" data-tab-link href="#companies-section">Companies</a>
+      <a class="tab" data-tab-link href="#admin-section">Admin</a>
     </nav>
 
     <main>
-      <section id="dashboard" class="tab-panel active">
+      <section id="dashboard-section" class="tab-panel active">
         <div class="layout">
           <section class="panel">
             <h2>Updates</h2>
@@ -43,9 +43,9 @@
         </div>
       </section>
 
-      <section id="companies" class="tab-panel">
+      <section id="companies-section" class="tab-panel">
         <section class="panel companies-panel">
-          <h2>Company Database (Fake Data for Now)</h2>
+          <h2>Company Database Section</h2>
           <table>
             <thead>
               <tr>
@@ -60,9 +60,9 @@
         </section>
       </section>
 
-      <section id="admin" class="tab-panel">
+      <section id="admin-section" class="tab-panel">
         <section class="panel admin-panel">
-          <h2>Admin: Add New Company</h2>
+          <h2>Admin Section: Add New Company</h2>
           <form id="company-form">
             <label>
               Company Name
@@ -87,7 +87,7 @@
             <button type="submit">Add Company</button>
           </form>
 
-          <p class="muted">Added companies appear in the Companies tab for this prototype session.</p>
+          <p class="muted">Added companies appear in the Company Database Section for this prototype session.</p>
         </section>
       </section>
     </main>
