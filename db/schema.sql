@@ -1,4 +1,4 @@
--- Initial PostgreSQL schema for Tele-CRM MVP
+-- Initial PostgreSQL schema for Telecomm CRM MVP
 
 CREATE TABLE IF NOT EXISTS users (
   id BIGSERIAL PRIMARY KEY,
