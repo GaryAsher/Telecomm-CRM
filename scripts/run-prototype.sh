@@ -16,8 +16,8 @@ if [ ! -d "$ROOT_DIR/prototype" ]; then
   exit 1
 fi
 
-cd "$ROOT_DIR/prototype"
+cd "$ROOT_DIR"
 
-echo "Serving prototype from: $(pwd)"
+echo "Serving prototype from: $ROOT_DIR/prototype"
 echo "Starting Telecomm CRM prototype at http://localhost:${PORT}"
 python3 -m http.server "$PORT"
