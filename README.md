@@ -100,3 +100,21 @@ It includes:
 - `company_employees` table with name, phone, email, and 3 boolean placeholders
 
 To apply later in Postgres/Supabase, run the SQL as a migration.
+
+
+## One-click push helper in Codespaces
+If you want a clickable way to commit + push from Codespaces:
+
+1. Open the Command Palette (`Ctrl/Cmd + Shift + P`)
+2. Run: `Tasks: Run Task`
+3. Select: `Tele-CRM: Push Local Changes`
+
+This runs:
+```bash
+bash scripts/push-changes.sh
+```
+
+You can also run it manually with an optional custom commit message:
+```bash
+bash scripts/push-changes.sh "feat: your commit message"
+```
