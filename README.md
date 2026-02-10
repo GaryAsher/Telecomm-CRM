@@ -1,9 +1,9 @@
-# Telecomm-CRM
+# Tele-CRM
 
 Attempt at trying to make software that functionally works as a database and can receive caller information.
 
 ## Current project status
-This repository now includes an implementation foundation for a Telecomm CRM:
+This repository now includes an implementation foundation for a Tele-CRM:
 - Phased implementation roadmap in `docs/implementation-roadmap.md`
 - Initial architecture design in `docs/system-architecture.md`
 - PostgreSQL starter schema with RBAC + audit logging in `db/schema.sql`
@@ -37,7 +37,7 @@ This prototype is intentionally frontend-only (mock data) so you can validate wo
   - Permanent fix: `chmod +x scripts/run-prototype.sh`
   - If this keeps happening after pulls: `git update-index --chmod=+x scripts/run-prototype.sh`
 - **`No such file or directory` for the script**
-  - Make sure you are in the repo root first: `cd /workspace/Telecomm-CRM`
+  - Make sure you are in the repo root first: `cd /workspace/Tele-CRM`
 - **`python3: command not found`**
   - Use: `python -m http.server 4173 -d prototype`
 - **Port already in use**
@@ -58,12 +58,12 @@ If your changes are on GitHub but not on your computer, your local folder will n
 If you have **not cloned** the repo yet:
 ```bash
 git clone <your-repo-url>
-cd Telecomm-CRM
+cd Tele-CRM
 ```
 
 If you already cloned it before, but GitHub has newer commits:
 ```bash
-cd Telecomm-CRM
+cd Tele-CRM
 git pull origin <your-branch>
 ```
 
@@ -89,3 +89,14 @@ ls -l scripts/run-prototype.sh
 bash scripts/run-prototype.sh
 ```
 Then open the forwarded port URL for `4173` (or `http://localhost:4173`).
+
+
+## Simple company/employee database template
+A simplified schema for your current call-center use case is available at:
+- `db/simple-directory-schema.sql`
+
+It includes:
+- `companies` table with company name, location, and hours
+- `company_employees` table with name, phone, email, and 3 boolean placeholders
+
+To apply later in Postgres/Supabase, run the SQL as a migration.
