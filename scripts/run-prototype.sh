@@ -19,5 +19,5 @@ fi
 cd "$ROOT_DIR/prototype"
 
 echo "Serving prototype from: $(pwd)"
-echo "Starting Telecomm CRM prototype at http://localhost:${PORT}"
+echo "Starting Tele-CRM prototype at http://localhost:${PORT}"
 python3 -m http.server "$PORT"
