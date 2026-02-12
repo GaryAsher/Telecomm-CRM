@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Telecrom — CRM System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-app:#f0f2f5;--bg-s:#fff;--bg-side:#0c1222;--bg-muted:#f7f8fa;--bg-hover:#f3f4f6;
+  --bdr:#e3e5e8;--bdr-l:#f0f1f3;
+  --t1:#0f172a;--t2:#475569;--tm:#94a3b8;--ti:#f1f5f9;
+  --acc:#c8a44e;--acc-d:#a07c2a;--acc-bg:rgba(200,164,78,0.08);
+  --blue:#3b82f6;--blue-bg:#dbeafe;--green:#10b981;--green-bg:#d1fae5;
+  --amber:#f59e0b;--amber-bg:#fef3c7;--red:#ef4444;--red-bg:#fee2e2;
+  --violet:#8b5cf6;--violet-bg:#ede9fe;--teal:#0d9488;--indigo:#6366f1;
+  --r:8px;--rl:14px;--rf:999px;
+  --font:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--bg-app);color:var(--t1);line-height:1.5;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:var(--rf)}
+
+#app{display:flex;height:100vh}
+
+/* SIDEBAR */
+.sb{width:228px;flex-shrink:0;background:var(--bg-side);display:flex;flex-direction:column;border-right:1px solid #1e293b;user-select:none}
+.sb-brand{padding:20px 18px 16px;border-bottom:1px solid #1e293b;display:flex;align-items:center;gap:11px}
+.sb-ico{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#c8a44e,#a07c2a);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(200,164,78,0.3)}
+.sb-ico svg{width:18px;height:18px;color:#fff}
+.sb-name{font-size:16px;font-weight:700;color:var(--ti);letter-spacing:-0.3px}
+.sb-sub{font-size:10px;color:#64748b;font-weight:500;letter-spacing:1px;text-transform:uppercase}
+.sb-nav{padding:12px 10px;flex:1}
+.nb{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:none;border-radius:10px;background:transparent;color:#94a3b8;font:500 13px var(--font);cursor:pointer;margin-bottom:2px;transition:all .12s;text-align:left}
+.nb:hover{background:rgba(255,255,255,0.04)}.nb.on{background:rgba(200,164,78,0.12);color:var(--acc);font-weight:600}
+.nb svg{width:17px;height:17px;flex-shrink:0}.nb-l{flex:1}
+.nb-b{font-size:10px;font-weight:700;padding:2px 7px;border-radius:var(--rf);min-width:20px;text-align:center;background:#334155;color:#94a3b8}
+.nb.on .nb-b{background:var(--acc);color:var(--bg-side)}
+.sb-user{padding:14px 18px;border-top:1px solid #1e293b;display:flex;align-items:center;gap:10px}
+.sb-av{width:32px;height:32px;border-radius:var(--rf);background:#1e293b;display:flex;align-items:center;justify-content:center}
+.sb-av svg{width:15px;height:15px;color:#94a3b8}
+
+.main{flex:1;overflow:auto;padding:26px 30px;max-height:100vh}
+
+/* COMMON */
+.card{background:var(--bg-s);border:1px solid var(--bdr);border-radius:var(--rl);box-shadow:0 1px 2px rgba(0,0,0,0.04)}
+.ch{padding:18px 20px 14px;border-bottom:1px solid var(--bdr-l);display:flex;align-items:center;justify-content:space-between}
+.ct{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.ct svg{width:16px;height:16px;color:var(--acc)}
+.cb{padding:14px 16px}
+
+/* Badges */
+.bg{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:var(--rf);font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;white-space:nowrap}
+.bg-new{color:var(--blue);background:var(--blue-bg)}.bg-ip{color:var(--amber);background:var(--amber-bg)}.bg-fu{color:var(--violet);background:var(--violet-bg)}.bg-esc{color:var(--red);background:var(--red-bg)}.bg-res{color:var(--green);background:var(--green-bg)}
+.bg-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.bg-t{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--rf);font-size:10px;font-weight:600;color:var(--t2);background:var(--bg-muted);text-transform:uppercase}
+.bg-t svg{width:10px;height:10px}
+.bg-d{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600}
+.bg-d svg{width:10px;height:10px}
+.bg-d.din{color:var(--teal)}.bg-d.dout{color:var(--indigo)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:var(--r);font:600 12px var(--font);cursor:pointer;padding:8px 14px;transition:all .12s}
+.btn svg{width:13px;height:13px}
+.btn-p{background:var(--acc);color:#fff}.btn-p:hover{background:var(--acc-d)}
+.btn-o{background:#fff;color:var(--t2);border:1px solid var(--bdr)}.btn-o:hover{border-color:var(--acc);background:var(--acc-bg)}
+.btn-g{background:none;color:var(--acc);padding:6px 10px;font-weight:600}.btn-g:hover{background:var(--acc-bg)}
+.btn-lg{padding:11px 20px;font-size:14px;font-weight:700;border-radius:10px;width:100%;justify-content:center}
+
+/* Filters */
+.fp{border:1px solid var(--bdr);background:#fff;color:var(--tm);padding:4px 11px;border-radius:var(--rf);font:600 11px var(--font);cursor:pointer;transition:all .12s;text-transform:capitalize}
+.fp:hover{border-color:var(--acc);color:var(--acc-d)}.fp.on{border-color:var(--acc);background:var(--acc-bg);color:var(--acc-d)}
+
+/* Search */
+.sw{position:relative}.sw svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--tm);pointer-events:none}
+.si{width:100%;padding:8px 12px 8px 32px;border:1px solid var(--bdr);border-radius:var(--r);font:13px var(--font);background:var(--bg-muted);outline:none;transition:border-color .15s;color:var(--t1)}
+.si:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(200,164,78,0.1)}.si::placeholder{color:var(--tm)}
+
+/* List & detail */
+.li{padding:12px 14px;border-radius:10px;cursor:pointer;margin-bottom:3px;border:1px solid transparent;transition:all .1s}
+.li:hover{background:var(--bg-muted)}.li.on{background:var(--acc-bg);border-color:var(--acc)}
+.li-t{font-size:13px;font-weight:600;color:var(--t1)}.li-s{font-size:12px;color:var(--tm);margin-top:2px}
+.li-m{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--tm);margin-top:3px}
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+.ic{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;background:var(--bg-muted)}
+.ic svg{width:14px;height:14px;color:var(--tm);margin-top:2px;flex-shrink:0}
+.ic-l{font-size:10px;font-weight:600;color:var(--tm);text-transform:uppercase;letter-spacing:.5px}
+.ic-v{font-size:13px;color:var(--t1);margin-top:2px}
+.sl{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+
+/* Timeline */
+.tli{padding:12px 14px;border-radius:10px;background:var(--bg-muted);margin-bottom:6px;border-left:3px solid var(--acc)}
+.tl-b{display:flex;align-items:center;gap:8px;margin-bottom:6px}.tl-time{font-size:11px;color:var(--tm);margin-left:auto}
+.tl-d{display:flex;gap:16px;font-size:12px;color:var(--t2);margin-bottom:5px}.tl-d strong{font-weight:600}
+.tl-n{font-size:12px;color:var(--tm);line-height:1.5}
+
+/* Status pills */
+.sp{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:var(--rf);font:600 12px var(--font);cursor:pointer;border:1px solid var(--bdr);background:#fff;color:var(--tm);transition:all .12s}
+.sp:hover{border-color:currentColor}.sp.on{border-color:currentColor}
+.sp svg{width:12px;height:12px}
+
+/* Table */
+.dt{width:100%;border-collapse:collapse;font-size:13px}
+.dt thead{background:var(--bg-muted)}
+.dt th{padding:10px 16px;text-align:left;font-weight:600;color:var(--tm);font-size:11px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--bdr)}
+.dt td{padding:11px 16px;border-bottom:1px solid var(--bdr-l)}
+.dt tbody tr{transition:background .08s}.dt tbody tr:hover{background:#fafbfc}
+.td-n{font-weight:600;color:var(--t1)}.td-s{color:var(--acc-d);font-size:11px;margin-left:5px}
+
+/* Splits */
+.spl{display:grid;gap:16px;height:calc(100vh - 80px)}
+.spl.hd{grid-template-columns:380px 1fr}.spl.hdw{grid-template-columns:400px 1fr}
+.lp{background:var(--bg-s);border:1px solid var(--bdr);border-radius:var(--rl);box-shadow:0 1px 2px rgba(0,0,0,0.04);display:flex;flex-direction:column;overflow:hidden}
+.lps{flex:1;overflow:auto;padding:8px 10px}
+.dp{background:var(--bg-s);border:1px solid var(--bdr);border-radius:var(--rl);box-shadow:0 1px 2px rgba(0,0,0,0.04);overflow:auto}
+.dh{padding:20px 24px;border-bottom:1px solid var(--bdr-l)}.db{padding:16px 24px}
+.dt-t{font-size:19px;font-weight:700;margin-bottom:6px}
+
+/* Full card */
+.fc{background:var(--bg-s);border:1px solid var(--bdr);border-radius:var(--rl);box-shadow:0 1px 2px rgba(0,0,0,0.04);overflow:hidden}
+.fcs{overflow:auto;max-height:calc(100vh - 180px)}
+
+/* Stats */
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.sc{background:var(--bg-s);border:1px solid var(--bdr);border-radius:var(--rl);padding:18px 20px;box-shadow:0 1px 2px rgba(0,0,0,0.04);animation:fsu .35s ease both}
+.sc:nth-child(2){animation-delay:.04s}.sc:nth-child(3){animation-delay:.08s}.sc:nth-child(4){animation-delay:.12s}
+.sc-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sc-l{font-size:11px;font-weight:600;color:var(--tm);text-transform:uppercase;letter-spacing:.5px}
+.sc-i{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.sc-i svg{width:15px;height:15px}
+.sc-v{font-size:28px;font-weight:700;color:var(--t1)}
+
+/* Update feed */
+.ui{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;background:var(--bg-muted);margin-bottom:6px;animation:fsu .3s ease both}
+.ui:nth-child(2){animation-delay:.03s}.ui:nth-child(3){animation-delay:.06s}.ui:nth-child(4){animation-delay:.09s}.ui:nth-child(5){animation-delay:.12s}
+.ud{width:6px;height:6px;border-radius:50%;margin-top:7px;flex-shrink:0}
+.ut{font-size:13px;color:var(--t1)}.utim{font-size:11px;color:var(--tm);margin-top:2px}
+
+/* Misc */
+.ri{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:10px;background:var(--bg-muted);margin-bottom:6px}
+.qa{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--bdr);background:#fff;color:var(--t2);padding:10px 20px;border-radius:10px;font:600 13px var(--font);cursor:pointer;transition:all .12s}
+.qa:hover{border-color:var(--acc);background:var(--acc-bg)}.qa svg{width:15px;height:15px}
+.es{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;color:var(--tm)}
+.es svg{width:40px;height:40px;stroke-width:1}.es-t{margin:12px 0 4px;font-size:15px;font-weight:600;color:var(--t2)}.es-s{font-size:13px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g2w{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* Modal */
+.mo{position:fixed;inset:0;background:rgba(15,23,42,0.45);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1000;animation:fi .15s ease}
+.mb{background:#fff;border-radius:16px;box-shadow:0 25px 60px rgba(0,0,0,0.18);width:min(520px,92vw);max-height:85vh;overflow:auto;animation:su .2s ease}
+.mi{padding:24px 28px}
+.mtr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.mtt{font-size:17px;font-weight:700}
+.mc{border:none;background:none;cursor:pointer;color:var(--tm);padding:4px;display:flex}.mc svg{width:18px;height:18px}
+.ff{display:block;margin-bottom:14px}
+.fl{display:block;font-size:11px;font-weight:600;color:var(--t2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.fi-i,.fi-s,.fi-ta{width:100%;padding:9px 12px;border:1px solid var(--bdr);border-radius:var(--r);font:13px var(--font);background:var(--bg-muted);color:var(--t1);outline:none;transition:border-color .15s}
+.fi-i:focus,.fi-s:focus,.fi-ta:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(200,164,78,0.1)}
+.fi-i::placeholder,.fi-ta::placeholder{color:var(--tm)}
+.fi-s{appearance:none;cursor:pointer}.fi-ta{min-height:80px;resize:vertical}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fch{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t2);margin-bottom:16px;cursor:pointer}
+
+@keyframes fi{from{opacity:0}to{opacity:1}}
+@keyframes su{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fsu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:900px){
+  .sb{width:60px}.sb-name,.sb-sub,.nb-l,.nb-b,.sb-user div:last-child{display:none}
+  .sb-brand{justify-content:center;padding:16px 8px}.sb-user{justify-content:center;padding:14px 8px}
+  .nb{justify-content:center;padding:10px}.main{padding:16px 14px}
+  .sg{grid-template-columns:repeat(2,1fr)}.g2,.g2w{grid-template-columns:1fr}
+  .spl.hd,.spl.hdw{grid-template-columns:1fr}.dp{display:none}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <aside class="sb">
+    <div class="sb-brand">
+      <div class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+      <div><div class="sb-name">Telecrom</div><div class="sb-sub">CRM System</div></div>
+    </div>
+    <nav class="sb-nav" id="nav"></nav>
+    <div class="sb-user">
+      <div class="sb-av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <div><div style="font-size:12px;font-weight:600;color:#e2e8f0">Agent Demo</div><div style="font-size:10px;color:#64748b">agent@telecrom.app</div></div>
+    </div>
+  </aside>
+  <main class="main" id="mc"></main>
+</div>
+<div id="mr"></div>
+<script>
+// ═══ ICONS ═══
+const I={
+  dash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/></svg>',
+  pcall:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/><path d="M14.05 2a9 9 0 0 1 8 7.94"/><path d="M14.05 6A5 5 0 0 1 18 10"/></svg>',
+  bld:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>',
+  usrs:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  clip:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>',
+  gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>',
+  ph:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 2 16 8 22 8"/><line x1="23" y1="1" x2="16" y2="8"/><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+  pout:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 7 23 1 17 1"/><line x1="16" y1="8" x2="23" y2="1"/><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+  warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
+  chk:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
+  src:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+  cr:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
+  ck:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+  usr:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  hash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg>',
+  msg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+  mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>',
+  file:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>',
+  map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+  clk:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  shd:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>',
+  act:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>',
+};
+function ic(n,s){return`<span style="display:inline-flex;width:${s||16}px;height:${s||16}px">${I[n]||''}</span>`}
+
+// ═══ DATA ═══
+function uid(){return crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:(r&0x3|0x8)).toString(16)})}
+const S={companies:[],contacts:[],callers:[],interactions:[],updates:[],selC:null,selCo:null,cs:'',cos:'',cts:'',cf:'all'};
+S.companies=[
+  {id:uid(),name:"Northside Family Practice",location:"Springfield, IL",hours:"Mon–Fri 8 AM – 5 PM",phone:"(217) 555-0140",type:"Healthcare",ec:26},
+  {id:uid(),name:"Riverbend Internal Medicine",location:"Columbus, OH",hours:"Mon–Sat 9 AM – 6 PM",phone:"(614) 555-0188",type:"Healthcare",ec:41},
+  {id:uid(),name:"Pinecrest Health Group",location:"Nashville, TN",hours:"Mon–Fri 7:30 AM – 7 PM",phone:"(615) 555-0234",type:"Healthcare",ec:32},
+  {id:uid(),name:"Summit Ridge Insurance",location:"Denver, CO",hours:"Mon–Fri 8:30 AM – 5:30 PM",phone:"(303) 555-0912",type:"Insurance",ec:18},
+  {id:uid(),name:"Clearwater Dental Associates",location:"Tampa, FL",hours:"Mon–Thu 8 AM – 4:30 PM",phone:"(813) 555-0377",type:"Healthcare",ec:14},
+];
+const cn=[["Dr. Sarah Chen","Office Manager"],["Marcus Williams","Receptionist"],["Linda Torres","Billing Coordinator"],["James O'Brien","Nurse Practitioner"],["Priya Sharma","Scheduling Lead"],["David Kim","IT Administrator"],["Angela Foster","Claims Specialist"],["Robert Garcia","Medical Assistant"],["Michelle Lee","HR Director"],["Thomas Wright","Front Desk"],["Karen Patel","Lab Technician"],["Steven Adams","Pharmacist"]];
+S.contacts=cn.map(([n,t],i)=>({id:uid(),cid:S.companies[i%S.companies.length].id,name:n,title:t,phone:`(555) ${String(100+i*37).padStart(3,'0')}-${String(1000+i*111).slice(0,4)}`,email:`${n.split(' ').pop().toLowerCase()}@${S.companies[i%S.companies.length].name.split(' ')[0].toLowerCase()}.com`,pri:i%3===0}));
+const cd=[{name:"Jordan Lee",phone:"+1 (555) 123-9876",ar:"ACCT-10045",st:"new",reason:"Billing question"},{name:"Casey Nguyen",phone:"+1 (555) 834-2211",ar:"ACCT-20017",st:"follow-up",reason:"Service outage"},{name:"Taylor Smith",phone:"+1 (555) 349-0088",ar:"ACCT-33002",st:"escalated",reason:"Medication refill request"},{name:"Morgan Davis",phone:"+1 (555) 670-4455",ar:"ACCT-10098",st:"new",reason:"Appointment rescheduling"},{name:"Riley Johnson",phone:"+1 (555) 912-3344",ar:"ACCT-20033",st:"in-progress",reason:"Insurance verification"},{name:"Avery Thompson",phone:"+1 (555) 201-7788",ar:"ACCT-33015",st:"resolved",reason:"Prescription transfer"}];
+S.callers=cd.map((c,i)=>({id:uid(),...c,cid:S.companies[i%S.companies.length].id,at:new Date(Date.now()-(cd.length-i)*3600000).toISOString()}));
+const its=["call","call","call","email","note"],ds=["inbound","outbound"],ocs=["Resolved","Callback scheduled","Transferred to supervisor","Left voicemail","Information provided","Escalated"],nts=["Caller inquired about recent billing charge. Explained line items and caller was satisfied.","Follow-up call regarding service outage. Confirmed restoration and offered credit.","Medication refill forwarded to pharmacy team. Caller will receive confirmation call.","Attempted callback — no answer. Left voicemail with reference number.","Verified insurance coverage details. Sent summary via email.","Appointment rescheduled to next available slot. Confirmation sent.","Escalated to supervisor per caller request. Added notes for context.","Routine check-in. No issues reported. Updated contact preferences."];
+S.interactions=S.callers.flatMap((c,ci)=>Array.from({length:1+(ci%3)},(_,j)=>({id:uid(),cid:c.id,type:its[(ci+j)%its.length],dir:ds[(ci+j)%2],out:ocs[(ci+j)%ocs.length],notes:nts[(ci*2+j)%nts.length],at:new Date(Date.now()-(10-ci)*3600000-j*1800000).toISOString(),dur:60+Math.floor(Math.random()*600)})));
+S.updates=[{id:uid(),text:"Shift handoff notes added for Team A",time:"8:45 AM",type:"info"},{id:uid(),text:"MFA reminders for all agents due Friday",time:"9:12 AM",type:"warning"},{id:uid(),text:"New appointment script draft ready for review",time:"10:30 AM",type:"info"},{id:uid(),text:"Medication refill callback queue reviewed",time:"11:00 AM",type:"success"},{id:uid(),text:"Weekend coverage schedule updated by supervisor",time:"11:45 AM",type:"info"}];
+
+// ═══ HELPERS ═══
+const ST={"new":{l:"New",c:"var(--blue)",b:"var(--blue-bg)",cl:"bg-new"},"in-progress":{l:"In Progress",c:"var(--amber)",b:"var(--amber-bg)",cl:"bg-ip"},"follow-up":{l:"Follow-up",c:"var(--violet)",b:"var(--violet-bg)",cl:"bg-fu"},"escalated":{l:"Escalated",c:"var(--red)",b:"var(--red-bg)",cl:"bg-esc"},"resolved":{l:"Resolved",c:"var(--green)",b:"var(--green-bg)",cl:"bg-res"}};
+function e(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function ft(i){if(!i)return'—';return new Date(i).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true})}
+function fd(i){if(!i)return'—';return new Date(i).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}
+function fdr(s){if(!s)return'—';return`${Math.floor(s/60)}m ${s%60}s`}
+function gc(id){return S.companies.find(c=>c.id===id)}
+function gi(cid){return S.interactions.filter(i=>i.cid===cid).sort((a,b)=>new Date(b.at)-new Date(a.at))}
+function gcc(cid){return S.contacts.filter(c=>c.cid===cid)}
+function bh(st){const s=ST[st]||{l:st,cl:''};return`<span class="bg ${s.cl}"><span class="bg-dot"></span>${e(s.l)}</span>`}
+function tbh(t){const ic2=t==='call'?ic('ph',10):t==='email'?ic('mail',10):ic('file',10);return`<span class="bg-t">${ic2} ${e(t)}</span>`}
+function dbh(d){return`<span class="bg-d ${d==='inbound'?'din':'dout'}">${d==='inbound'?ic('pin',10):ic('pout',10)} ${d==='inbound'?'IN':'OUT'}</span>`}
+
+// ═══ NAV ═══
+let tab='dashboard';
+const NV=[{id:'dashboard',l:'Dashboard',i:'dash'},{id:'queue',l:'Call Queue',i:'pcall',bf:()=>S.callers.filter(c=>c.st!=='resolved').length},{id:'companies',l:'Companies',i:'bld'},{id:'contacts',l:'Contacts',i:'usrs'},{id:'log',l:'Call Log',i:'clip'},{id:'admin',l:'Admin',i:'gear'}];
+function rn(){
+  const n=document.getElementById('nav');
+  n.innerHTML=NV.map(v=>{const a=tab===v.id,bv=v.bf?v.bf():0;return`<button class="nb${a?' on':''}" data-n="${v.id}">${ic(v.i,17)}<span class="nb-l">${v.l}</span>${bv>0?`<span class="nb-b">${bv}</span>`:''}</button>`}).join('');
+  n.querySelectorAll('.nb').forEach(b=>b.addEventListener('click',()=>{tab=b.dataset.n;S.selC=null;S.selCo=null;R()}));
+}
+
+// ═══ RENDER ═══
+function R(){rn();const m=document.getElementById('mc');({dashboard:rD,queue:rQ,companies:rCo,contacts:rCt,log:rL,admin:rA}[tab]||rD)(m)}
+
+// Dashboard
+function rD(el){
+  const now=new Date(),ds=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}),ts=now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  const aq=S.callers.filter(c=>c.st!=='resolved'),esc=S.callers.filter(c=>c.st==='escalated').length,res=S.callers.filter(c=>c.st==='resolved').length;
+  el.innerHTML=`<div style="margin-bottom:22px"><h1 style="font-size:22px;font-weight:700">Dashboard</h1><p style="font-size:13px;color:var(--tm);margin-top:4px">${e(ds)} · ${e(ts)}</p></div>
+  <div class="sg">
+    <div class="sc"><div class="sc-h"><span class="sc-l">Active Queue</span><div class="sc-i" style="background:var(--blue-bg)">${ic('pcall',15)}</div></div><div class="sc-v">${aq.length}</div></div>
+    <div class="sc"><div class="sc-h"><span class="sc-l">Escalated</span><div class="sc-i" style="background:var(--red-bg)">${ic('warn',15)}</div></div><div class="sc-v">${esc}</div></div>
+    <div class="sc"><div class="sc-h"><span class="sc-l">Resolved Today</span><div class="sc-i" style="background:var(--green-bg)">${ic('chk',15)}</div></div><div class="sc-v">${res}</div></div>
+    <div class="sc"><div class="sc-h"><span class="sc-l">Total Companies</span><div class="sc-i" style="background:var(--violet-bg)">${ic('bld',15)}</div></div><div class="sc-v">${S.companies.length}</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ch"><span class="ct">${ic('bell',15)} Updates &amp; Notices</span></div><div class="cb" id="du"></div></div>
+    <div class="card"><div class="ch"><span class="ct">${ic('pcall',15)} Active Queue</span><button class="btn btn-g" id="dva">View all ${ic('cr',13)}</button></div><div class="cb" id="dq"></div></div>
+  </div>`;
+  document.getElementById('du').innerHTML=S.updates.map(u=>{const dc=u.type==='warning'?'var(--amber)':u.type==='success'?'var(--green)':'var(--blue)';return`<div class="ui"><div class="ud" style="background:${dc}"></div><div><div class="ut">${e(u.text)}</div><div class="utim">${e(u.time)}</div></div></div>`}).join('');
+  document.getElementById('dq').innerHTML=aq.slice(0,5).map(c=>`<div class="li" data-ci="${c.id}" style="display:flex;align-items:center;justify-content:space-between"><div><div class="li-t">${e(c.name)}</div><div class="li-s">${e(c.reason)}</div></div>${bh(c.st)}</div>`).join('');
+  document.getElementById('dq').querySelectorAll('[data-ci]').forEach(el=>el.addEventListener('click',()=>{S.selC=S.callers.find(c=>c.id===el.dataset.ci);tab='queue';R()}));
+  document.getElementById('dva').addEventListener('click',()=>{tab='queue';R()});
+}
+
+// Queue
+function rQ(el){
+  const fl=S.callers.filter(c=>{const s=S.cs.toLowerCase();const ms=!s||c.name.toLowerCase().includes(s)||c.phone.includes(s)||c.ar.toLowerCase().includes(s);const mf=S.cf==='all'||c.st===S.cf;return ms&&mf});
+  const hs=!!S.selC;
+  el.innerHTML=`<div class="spl${hs?' hd':''}">
+    <div class="lp">
+      <div class="ch" style="flex-direction:column;align-items:stretch;gap:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between"><h2 style="font-size:17px;font-weight:700">Call Queue</h2><button class="btn btn-p" id="bnc">${ic('plus',13)} New Caller</button></div>
+        <div class="sw">${ic('src',14)}<input class="si" placeholder="Search callers..." id="csi" value="${e(S.cs)}"></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="cfl"></div>
+      </div>
+      <div class="lps" id="cl"></div>
+    </div>
+    ${hs?'<div class="dp" id="cd"></div>':''}
+  </div>`;
+  const ff=document.getElementById('cfl');
+  ['all',...Object.keys(ST)].forEach(s=>{const p=document.createElement('button');p.className=`fp${S.cf===s?' on':''}`;p.textContent=s==='all'?'All':ST[s].l;p.addEventListener('click',()=>{S.cf=s;R()});ff.appendChild(p)});
+  document.getElementById('csi').addEventListener('input',ev=>{S.cs=ev.target.value;R()});
+  const cl=document.getElementById('cl');
+  if(!fl.length){cl.innerHTML=`<div class="es">${ic('ph',40)}<div class="es-t">No callers found</div><div class="es-s">Adjust your search or filters</div></div>`}
+  else{cl.innerHTML=fl.map(c=>{const co=gc(c.cid);return`<div class="li${S.selC?.id===c.id?' on':''}" data-ci="${c.id}"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><span class="li-t">${e(c.name)}</span>${bh(c.st)}</div><div class="li-s">${e(c.reason)}</div><div class="li-m"><span>${e(c.phone)}</span>${co?`<span>· ${e(co.name)}</span>`:''}</div></div>`}).join('');
+  cl.querySelectorAll('[data-ci]').forEach(el=>el.addEventListener('click',()=>{S.selC=S.callers.find(c=>c.id===el.dataset.ci);R()}))}
+  if(hs)rCD();
+  document.getElementById('bnc').addEventListener('click',()=>oM('caller'));
+}
+
+function rCD(){
+  const c=S.selC;if(!c)return;const co=gc(c.cid),ins=gi(c.id),d=document.getElementById('cd');
+  d.innerHTML=`<div class="dh"><div style="display:flex;align-items:flex-start;justify-content:space-between"><div><div class="dt-t">${e(c.name)}</div><div style="display:flex;align-items:center;gap:10px">${bh(c.st)}<span style="font-size:12px;color:var(--tm)">${fd(c.at)}</span></div></div><button class="btn btn-o" id="bli">${ic('plus',13)} Log Interaction</button></div></div>
+  <div class="db">
+    <div class="ig">
+      <div class="ic">${ic('ph',14)}<div><div class="ic-l">Phone</div><div class="ic-v">${e(c.phone)}</div></div></div>
+      <div class="ic">${ic('hash',14)}<div><div class="ic-l">Account</div><div class="ic-v">${e(c.ar)}</div></div></div>
+      <div class="ic">${ic('bld',14)}<div><div class="ic-l">Company</div><div class="ic-v">${co?e(co.name):'—'}</div></div></div>
+      <div class="ic">${ic('msg',14)}<div><div class="ic-l">Reason</div><div class="ic-v">${e(c.reason)}</div></div></div>
+    </div>
+    <div class="sl">Update Status</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px" id="sps"></div>
+    <div class="sl">Interaction History</div>
+    <div id="itl"></div>
+  </div>`;
+  const sp=document.getElementById('sps');
+  Object.entries(ST).forEach(([k,v])=>{const p=document.createElement('button');p.className='sp'+(c.st===k?' on':'');p.style.color=v.c;if(c.st===k){p.style.borderColor=v.c;p.style.background=v.b}p.innerHTML=(c.st===k?ic('ck',12):'')+v.l;p.addEventListener('click',()=>{const ca=S.callers.find(x=>x.id===c.id);if(ca){ca.st=k;S.selC=ca}R()});sp.appendChild(p)});
+  const tl=document.getElementById('itl');
+  if(!ins.length){tl.innerHTML='<p style="color:var(--tm);font-size:13px;font-style:italic;padding:12px">No interactions recorded yet.</p>'}
+  else{tl.innerHTML=ins.map(i=>`<div class="tli"><div class="tl-b">${tbh(i.type)} ${dbh(i.dir)}<span class="tl-time">${fd(i.at)} at ${ft(i.at)}</span></div><div class="tl-d"><span><strong>Outcome:</strong> ${e(i.out)}</span><span><strong>Duration:</strong> ${fdr(i.dur)}</span></div>${i.notes?`<div class="tl-n">${e(i.notes)}</div>`:''}</div>`).join('')}
+  document.getElementById('bli').addEventListener('click',()=>oM('interaction'));
+}
+
+// Companies
+function rCo(el){
+  const fl=S.companies.filter(c=>{const s=S.cos.toLowerCase();return!s||c.name.toLowerCase().includes(s)||c.location.toLowerCase().includes(s)});
+  const hs=!!S.selCo;
+  el.innerHTML=`<div class="spl${hs?' hdw':''}">
+    <div class="lp">
+      <div class="ch" style="flex-direction:column;align-items:stretch;gap:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between"><h2 style="font-size:17px;font-weight:700">Companies</h2><button class="btn btn-p" id="bncm">${ic('plus',13)} Add Company</button></div>
+        <div class="sw">${ic('src',14)}<input class="si" placeholder="Search companies..." id="cmsi" value="${e(S.cos)}"></div>
+      </div>
+      <div class="lps" id="cml"></div>
+    </div>
+    ${hs?'<div class="dp" id="cmd"></div>':''}
+  </div>`;
+  document.getElementById('cmsi').addEventListener('input',ev=>{S.cos=ev.target.value;R()});
+  const cl=document.getElementById('cml');
+  cl.innerHTML=fl.map(c=>{const cc=gcc(c.id).length;return`<div class="li${S.selCo?.id===c.id?' on':''}" data-ci="${c.id}"><div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;border-radius:10px;background:var(--bg-muted);display:flex;align-items:center;justify-content:center;flex-shrink:0">${ic('bld',16)}</div><div style="flex:1;min-width:0"><div class="li-t">${e(c.name)}</div><div class="li-s">${e(c.location)} · ${cc} contact${cc!==1?'s':''}</div></div><span style="font-size:10px;font-weight:600;padding:3px 8px;border-radius:var(--rf);background:var(--bg-muted);color:var(--tm);text-transform:uppercase">${e(c.type)}</span></div></div>`}).join('');
+  cl.querySelectorAll('[data-ci]').forEach(el=>el.addEventListener('click',()=>{S.selCo=S.companies.find(c=>c.id===el.dataset.ci);R()}));
+  if(hs)rCoD();
+  document.getElementById('bncm').addEventListener('click',()=>oM('company'));
+}
+
+function rCoD(){
+  const c=S.selCo;if(!c)return;const cts=gcc(c.id),d=document.getElementById('cmd');
+  d.innerHTML=`<div class="dh"><div class="dt-t">${e(c.name)}</div><span style="font-size:10px;font-weight:600;padding:3px 8px;border-radius:var(--rf);background:var(--bg-muted);color:var(--tm)">${e(c.type)}</span></div>
+  <div class="db">
+    <div class="ig">
+      <div class="ic">${ic('map',14)}<div><div class="ic-l">Location</div><div class="ic-v">${e(c.location)}</div></div></div>
+      <div class="ic">${ic('clk',14)}<div><div class="ic-l">Hours</div><div class="ic-v">${e(c.hours)}</div></div></div>
+      <div class="ic">${ic('ph',14)}<div><div class="ic-l">Phone</div><div class="ic-v">${e(c.phone)}</div></div></div>
+      <div class="ic">${ic('usrs',14)}<div><div class="ic-l">Employees</div><div class="ic-v">${c.ec}</div></div></div>
+    </div>
+    <div class="sl">Contacts (${cts.length})</div>
+    ${cts.map(ct=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:10px;background:var(--bg-muted);margin-bottom:6px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;border-radius:var(--rf);background:${ct.pri?'var(--amber-bg)':'var(--bg-muted)'};display:flex;align-items:center;justify-content:center">${ic('usr',14)}</div>
+        <div><div style="font-size:13px;font-weight:600;color:var(--t1)">${e(ct.name)} ${ct.pri?'<span style="font-size:10px;color:var(--acc-d)">★ Primary</span>':''}</div><div style="font-size:11px;color:var(--tm)">${e(ct.title)}</div></div>
+      </div>
+      <div style="text-align:right;font-size:11px;color:var(--tm)"><div>${e(ct.phone)}</div><div>${e(ct.email)}</div></div>
+    </div>`).join('')}
+  </div>`;
+}
+
+// Contacts
+function rCt(el){
+  const fl=S.contacts.filter(c=>{const s=S.cts.toLowerCase();return!s||c.name.toLowerCase().includes(s)||c.title.toLowerCase().includes(s)});
+  el.innerHTML=`<div class="fc"><div class="ch" style="flex-direction:column;align-items:stretch;gap:10px"><div style="display:flex;align-items:center;justify-content:space-between"><h2 style="font-size:17px;font-weight:700">Contacts</h2><button class="btn btn-p" id="bnct">${ic('plus',13)} Add Contact</button></div><div class="sw">${ic('src',14)}<input class="si" placeholder="Search contacts..." id="ctsi" value="${e(S.cts)}"></div></div>
+  <div class="fcs"><table class="dt"><thead><tr><th>Name</th><th>Title</th><th>Company</th><th>Phone</th><th>Email</th></tr></thead><tbody id="ctb"></tbody></table></div></div>`;
+  document.getElementById('ctsi').addEventListener('input',ev=>{S.cts=ev.target.value;R()});
+  document.getElementById('ctb').innerHTML=fl.map(c=>{const co=gc(c.cid);return`<tr><td class="td-n">${e(c.name)}${c.pri?'<span class="td-s">★</span>':''}</td><td>${e(c.title)}</td><td>${co?e(co.name):'—'}</td><td>${e(c.phone)}</td><td>${e(c.email)}</td></tr>`}).join('');
+  document.getElementById('bnct').addEventListener('click',()=>oM('contact'));
+}
+
+// Call Log
+function rL(el){
+  const sorted=[...S.interactions].sort((a,b)=>new Date(b.at)-new Date(a.at));
+  el.innerHTML=`<div class="fc"><div class="ch" style="flex-direction:column;align-items:stretch"><h2 style="font-size:17px;font-weight:700">Call Log</h2><p style="font-size:12px;color:var(--tm);margin-top:4px">${S.interactions.length} interactions recorded</p></div>
+  <div class="fcs"><table class="dt"><thead><tr><th>Caller</th><th>Type</th><th>Direction</th><th>Outcome</th><th>Duration</th><th>Date</th></tr></thead><tbody>${sorted.map(i=>{const ca=S.callers.find(c=>c.id===i.cid);return`<tr><td class="td-n">${ca?e(ca.name):'Unknown'}</td><td>${tbh(i.type)}</td><td>${dbh(i.dir)}</td><td>${e(i.out)}</td><td>${fdr(i.dur)}</td><td style="color:var(--tm);font-size:12px">${fd(i.at)} ${ft(i.at)}</td></tr>`}).join('')}</tbody></table></div></div>`;
+}
+
+// Admin
+function rA(el){
+  const roles=[{n:'Admin',d:'Full access',c:1},{n:'Supervisor',d:'Team management',c:2},{n:'Agent',d:'Caller interactions',c:8},{n:'Viewer',d:'Read-only',c:3}];
+  const stats=[{l:'Total Callers',v:S.callers.length},{l:'Total Interactions',v:S.interactions.length},{l:'Companies Registered',v:S.companies.length},{l:'Contacts in Directory',v:S.contacts.length}];
+  el.innerHTML=`<div style="margin-bottom:22px"><h1 style="font-size:22px;font-weight:700">Admin</h1><p style="font-size:13px;color:var(--tm);margin-top:4px">System management and configuration</p></div>
+  <div class="g2w">
+    <div class="card" style="padding:20px 24px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">${ic('shd',18)} <h3 style="font-size:15px;font-weight:700">Roles &amp; Permissions</h3></div>${roles.map(r=>`<div class="ri"><div><div style="font-size:13px;font-weight:600;color:var(--t1)">${r.n}</div><div style="font-size:11px;color:var(--tm)">${r.d}</div></div><span style="font-size:11px;font-weight:600;color:var(--tm);background:var(--bdr);padding:3px 8px;border-radius:var(--rf)">${r.c} user${r.c!==1?'s':''}</span></div>`).join('')}</div>
+    <div class="card" style="padding:20px 24px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">${ic('act',18)} <h3 style="font-size:15px;font-weight:700">System Stats</h3></div>${stats.map(s=>`<div class="ri"><span style="font-size:13px;color:var(--t2)">${s.l}</span><span style="font-size:15px;font-weight:700">${s.v}</span></div>`).join('')}</div>
+    <div class="card" style="padding:20px 24px;grid-column:1/-1"><div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">${ic('clip',18)} <h3 style="font-size:15px;font-weight:700">Quick Actions</h3></div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="qa" id="qac">${ic('bld',15)} Add Company</button><button class="qa" id="qacl">${ic('pcall',15)} Add Caller</button><button class="qa" id="qact">${ic('usrs',15)} Add Contact</button></div></div>
+  </div>`;
+  document.getElementById('qac').addEventListener('click',()=>oM('company'));
+  document.getElementById('qacl').addEventListener('click',()=>oM('caller'));
+  document.getElementById('qact').addEventListener('click',()=>oM('contact'));
+}
+
+// ═══ MODALS ═══
+function cM(){document.getElementById('mr').innerHTML=''}
+function oM(type){
+  const r=document.getElementById('mr');
+  const co=S.companies.map(c=>`<option value="${c.id}">${e(c.name)}</option>`).join('');
+  let title,fields,onS;
+  if(type==='caller'){title='New Caller';fields=`<label class="ff"><span class="fl">Full Name</span><input class="fi-i" id="mn" placeholder="e.g. Jordan Lee" required></label><label class="ff"><span class="fl">Phone Number</span><input class="fi-i" id="mp" placeholder="+1 (555) 000-0000" required></label><label class="ff"><span class="fl">Account Reference</span><input class="fi-i" id="ma" placeholder="ACCT-00000"></label><label class="ff"><span class="fl">Company</span><select class="fi-s" id="mco">${co}</select></label><label class="ff"><span class="fl">Reason</span><input class="fi-i" id="mr2" placeholder="e.g. Billing question"></label>`;onS=()=>{const n=document.getElementById('mn').value.trim(),p=document.getElementById('mp').value.trim();if(!n||!p)return;S.callers.unshift({id:uid(),name:n,phone:p,ar:document.getElementById('ma').value.trim()||'',cid:document.getElementById('mco').value,reason:document.getElementById('mr2').value.trim()||'',st:'new',at:new Date().toISOString()});cM();R()}}
+  else if(type==='company'){title='Add Company';fields=`<label class="ff"><span class="fl">Company Name</span><input class="fi-i" id="mn" placeholder="e.g. Northside Family Practice" required></label><label class="ff"><span class="fl">Location</span><input class="fi-i" id="ml" placeholder="City, ST"></label><label class="ff"><span class="fl">Hours</span><input class="fi-i" id="mh" placeholder="Mon-Fri 8:00 AM - 5:00 PM"></label><label class="ff"><span class="fl">Phone</span><input class="fi-i" id="mp" placeholder="(555) 000-0000"></label><div class="fr"><label class="ff"><span class="fl">Type</span><select class="fi-s" id="mt"><option>Healthcare</option><option>Insurance</option><option>Legal</option><option>Finance</option><option>Technology</option><option>Other</option></select></label><label class="ff"><span class="fl">Employees</span><input class="fi-i" id="me" type="number" min="1" value="1"></label></div>`;onS=()=>{const n=document.getElementById('mn').value.trim();if(!n)return;S.companies.push({id:uid(),name:n,location:document.getElementById('ml').value.trim(),hours:document.getElementById('mh').value.trim(),phone:document.getElementById('mp').value.trim(),type:document.getElementById('mt').value,ec:parseInt(document.getElementById('me').value)||1});cM();R()}}
+  else if(type==='contact'){title='Add Contact';fields=`<label class="ff"><span class="fl">Full Name</span><input class="fi-i" id="mn" placeholder="e.g. Dr. Sarah Chen" required></label><label class="ff"><span class="fl">Title / Role</span><input class="fi-i" id="mt" placeholder="e.g. Office Manager"></label><label class="ff"><span class="fl">Company</span><select class="fi-s" id="mco">${co}</select></label><div class="fr"><label class="ff"><span class="fl">Phone</span><input class="fi-i" id="mp" placeholder="(555) 000-0000"></label><label class="ff"><span class="fl">Email</span><input class="fi-i" id="me" placeholder="name@company.com"></label></div><label class="fch"><input type="checkbox" id="mpr"> Primary contact for this company</label>`;onS=()=>{const n=document.getElementById('mn').value.trim();if(!n)return;S.contacts.push({id:uid(),name:n,title:document.getElementById('mt').value.trim(),cid:document.getElementById('mco').value,phone:document.getElementById('mp').value.trim(),email:document.getElementById('me').value.trim(),pri:document.getElementById('mpr').checked});cM();R()}}
+  else if(type==='interaction'){title=`Log Interaction — ${e(S.selC?.name||'')}`;fields=`<div class="fr"><label class="ff"><span class="fl">Type</span><select class="fi-s" id="mt"><option value="call">Call</option><option value="email">Email</option><option value="note">Note</option></select></label><label class="ff"><span class="fl">Direction</span><select class="fi-s" id="md"><option value="inbound">Inbound</option><option value="outbound">Outbound</option></select></label></div><label class="ff"><span class="fl">Outcome</span><input class="fi-i" id="mo" placeholder="e.g. Resolved, Callback scheduled"></label><label class="ff"><span class="fl">Duration (seconds)</span><input class="fi-i" id="mdu" type="number" min="0" value="120"></label><label class="ff"><span class="fl">Notes</span><textarea class="fi-ta" id="mnt" placeholder="Add interaction notes..."></textarea></label>`;onS=()=>{if(!S.selC)return;S.interactions.unshift({id:uid(),cid:S.selC.id,type:document.getElementById('mt').value,dir:document.getElementById('md').value,out:document.getElementById('mo').value.trim(),notes:document.getElementById('mnt').value.trim(),dur:parseInt(document.getElementById('mdu').value)||0,at:new Date().toISOString()});cM();R()}}
+
+  const lbl=type==='interaction'?'Log Interaction':type==='caller'?'Add Caller':type==='company'?'Add Company':'Add Contact';
+  r.innerHTML=`<div class="mo" id="mov"><div class="mb"><div class="mi"><div class="mtr"><h3 class="mtt">${title}</h3><button class="mc" id="mcl">${ic('x',18)}</button></div>${fields}<button class="btn btn-p btn-lg" id="msu">${lbl}</button></div></div></div>`;
+  document.getElementById('mov').addEventListener('click',ev=>{if(ev.target===ev.currentTarget)cM()});
+  document.getElementById('mcl').addEventListener('click',cM);
+  document.getElementById('msu').addEventListener('click',onS);
+  const fi=r.querySelector('.fi-i');if(fi)setTimeout(()=>fi.focus(),50);
+}
+
+// ═══ BOOT ═══
+R();
+</script>
+</body>
+</html>
