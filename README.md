@@ -1,48 +1,160 @@
-# Tele-CRM
+# Telecrom — CRM System
 
-Attempt at trying to make software that functionally works as a database and can receive caller information.
+A telephone agent CRM built with **SvelteKit** + **Supabase** + **TypeScript**.
 
-## Current project status
-This repository now includes an implementation foundation for a Tele-CRM:
-- Phased implementation roadmap in `docs/implementation-roadmap.md`
-- Initial architecture design in `docs/system-architecture.md`
-- PostgreSQL starter schema with RBAC + audit logging in `db/schema.sql`
+## Quick Start
 
-## Stack recommendation
-Given your existing stack (`GitHub/Cloudflare Pages`, `Supabase`, `Cloudflare security`, and `Svelte`), you can build this project without moving to React. See `docs/stack-recommendation.md` for details.
+### 1. Install dependencies
 
-## Next steps
-1. Stand up SvelteKit app + Supabase project configuration
-2. Convert `db/schema.sql` into migrations in Supabase
-3. Implement auth and RBAC middleware/policies
-4. Build caller + interaction CRUD endpoints
-5. Build a minimal dashboard UI for agent workflows
+```bash
+npm install
+```
 
-### Troubleshooting (most common issues)
-- **`./scripts/run-prototype.sh: Permission denied`**
-  - Quick workaround (no chmod needed): `bash scripts/sync-and-run-prototype.sh`
-  - Permanent fix: `chmod +x scripts/run-prototype.sh`
-  - If this keeps happening after pulls: `git update-index --chmod=+x scripts/run-prototype.sh`
-- **`No such file or directory` for the script**
-  - Make sure you are in the repo root first: `cd /workspace/Tele-CRM`
-- **`python3: command not found`**
-  - Use: `python -m http.server 4173 -d prototype`
-- **Port already in use**
-  - Run on a different port: `./scripts/run-prototype.sh 4180`
-  - Then open: `http://localhost:4180`
-- **Script still doesn't work**
-  - Bypass the script directly:
-    ```bash
-    cd prototype
-    python3 -m http.server 4173
-    ```
+### 2. Set up Supabase
 
-## Simple company/employee database template
-A simplified schema for your current call-center use case is available at:
-- `db/simple-directory-schema.sql`
+1. Create a project at [supabase.com](https://supabase.com)
+2. Go to **SQL Editor** and run `db/schema.sql` — this creates all tables, roles, permissions, RLS policies, and seed data
+3. Copy your project credentials:
 
-It includes:
-- `companies` table with company name, location, and hours
-- `company_employees` table with name, phone, email, and 3 boolean placeholders
+```bash
+cp .env.example .env
+```
 
-To apply later in Postgres/Supabase, run the SQL as a migration.
+Fill in your `.env`:
+
+```
+PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+PUBLIC_SUPABASE_ANON_KEY=eyJ...
+SUPABASE_SERVICE_ROLE_KEY=eyJ...
+```
+
+### 3. Create your first user
+
+1. Go to Supabase Dashboard → **Authentication** → **Users** → **Add User**
+2. Or sign up through the app's login page
+3. Assign a role: run this in the SQL Editor:
+
+```sql
+-- Replace 'your-user-uuid' with the user's auth.users id
+-- Replace 'admin' with desired role
+INSERT INTO user_roles (user_id, role_id)
+SELECT 'your-user-uuid', r.id FROM roles r WHERE r.name = 'admin';
+```
+
+### 4. Run dev server
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173)
+
+---
+
+## Project Structure
+
+```
+telecrom-app/
+├── db/
+│   └── schema.sql                  # Full Postgres schema (run in Supabase SQL Editor)
+├── src/
+│   ├── app.css                     # Global design tokens
+│   ├── app.d.ts                    # App-wide TypeScript types
+│   ├── app.html                    # HTML shell
+│   ├── hooks.server.ts             # Auth guard, session handling, security headers
+│   ├── lib/
+│   │   ├── types.ts                # Domain types, status config
+│   │   ├── server/
+│   │   │   ├── supabase.ts         # Server-side Supabase client factory
+│   │   │   └── rbac.ts             # Permission checks, audit logging
+│   │   └── components/
+│   │       └── Sidebar.svelte      # Navigation sidebar
+│   └── routes/
+│       ├── +layout.svelte          # Root layout (Supabase browser client init)
+│       ├── +layout.server.ts       # Session data for all pages
+│       ├── login/                   # Login/signup (email + password)
+│       ├── (app)/                   # Authenticated route group
+│       │   ├── +layout.svelte      # App shell with sidebar
+│       │   ├── +layout.server.ts   # Loads sidebar badge counts
+│       │   ├── +page.*             # Dashboard
+│       │   ├── queue/              # Call queue (CRUD + status updates)
+│       │   ├── companies/          # Company directory
+│       │   ├── contacts/           # Contacts table
+│       │   ├── log/                # Interaction history
+│       │   └── admin/              # Roles & system stats
+│       └── api/
+│           └── webhooks/
+│               └── telephony/      # Inbound call webhook endpoint
+```
+
+---
+
+## Architecture
+
+### Authentication
+
+- **Supabase Auth** handles signup, login, and JWT management
+- Session tokens stored in **httpOnly cookies** (not localStorage) via `@supabase/ssr`
+- `hooks.server.ts` validates the JWT with `getUser()` on every request
+- Protected routes redirect to `/login` if no valid session
+
+### Authorization (RBAC)
+
+- 4 built-in roles: `admin`, `supervisor`, `agent`, `viewer`
+- Permissions are granular: `callers.read`, `callers.write`, `interactions.write`, etc.
+- **Server-side enforcement**: every form action calls `requirePermissions()` before mutating data
+- **Row Level Security**: Supabase RLS policies restrict reads at the database layer
+- Write operations use the **service role client** (bypasses RLS) after permission checks
+
+### Data Flow
+
+1. All form submissions use SvelteKit form actions (`use:enhance`)
+2. Server actions validate permissions → mutate via service client → write audit log
+3. Page data loads via `+page.server.ts` using the user-scoped Supabase client
+4. RLS ensures users only see data they're authorized for
+
+### Security Headers
+
+Applied automatically by `hooks.server.ts`:
+- `X-Content-Type-Options: nosniff`
+- `X-Frame-Options: DENY`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+
+### Telephony Webhook
+
+`POST /api/webhooks/telephony` accepts inbound call events:
+
+```json
+{
+  "phone": "+15551234567",
+  "caller_name": "Jordan Lee",
+  "call_sid": "CA123abc"
+}
+```
+
+Upserts the caller by normalized phone number and creates an interaction record.
+
+---
+
+## Deployment
+
+This project uses `@sveltejs/adapter-auto` which automatically detects your deployment platform.
+
+**Recommended options (per stack-recommendation.md):**
+
+- **Cloudflare Pages**: `npm i -D @sveltejs/adapter-cloudflare` — best performance + built-in WAF
+- **Vercel**: Works out of the box with adapter-auto
+- **Node server**: `npm i -D @sveltejs/adapter-node` — for self-hosted
+
+Remember to set environment variables in your deployment platform.
+
+---
+
+## Next Steps
+
+- [ ] Add Supabase Realtime for live queue updates
+- [ ] Implement proper telephony provider signature verification
+- [ ] Add agent assignment logic and routing
+- [ ] Build audit log viewer in admin panel
+- [ ] Add phone number masking in UI
+- [ ] Set up Supabase CLI for type generation (`supabase gen types typescript`)
